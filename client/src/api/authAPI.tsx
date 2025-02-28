@@ -15,7 +15,7 @@ const login = async (userInfo: UserLogin) => {
     // Throw error if response status is not OK (200-299)
     if (!response.ok) {
       const errorData = await response.json(); // Parse error response as JSON
-      throw new Error(`Error: ${errorData.message}`); // Throw a detailed error message    
+      throw new Error(errorData.message || "Invalid username or password"); // Throw a detailed error message    
     }
 
     // Parse the response body as JSON
@@ -23,10 +23,16 @@ const login = async (userInfo: UserLogin) => {
 
     return data;  // Return the data received from the server
   } catch (err) {
-    console.log('Error from user login: ', err);  // Log any errors that occur during fetch
-    return Promise.reject('Could not fetch user info');  // Return a rejected promise with an error message
+    if (err instanceof Error) {
+      console.error("Login error:", err.message);
+      // Pass the actual error message
+      return Promise.reject(err.message);
+    } else {
+      console.error("Unexpected error:", err);
+      return Promise.reject("An unexpected error occurred. Please try again.");
+    }
   }
-}
+};
 
 
 

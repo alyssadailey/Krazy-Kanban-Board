@@ -3,6 +3,7 @@ import jwt from 'jsonwebtoken';
 
 interface JwtPayload {
   username: string;
+  exp: number;
 }
 
 export const authenticateToken = (req: Request, res: Response, next: NextFunction) => {
@@ -11,24 +12,25 @@ export const authenticateToken = (req: Request, res: Response, next: NextFunctio
   const authHeader = req.headers.authorization;
 
   // Check if the authorization header is present
-  if (authHeader) {
-    // Extract the token from the authorization header
-    const token = authHeader.split(' ')[1];
-
-    // Get the secret key from the environment variables
-    const secretKey = process.env.JWT_SECRET_KEY || '';
-
-    // Verify the JWT token
-    jwt.verify(token, secretKey, (err, user) => {
-      if (err) {
-        return res.sendStatus(403); // Send forbidden status if the token is invalid
+  if (!authHeader) {
+    return res.status(401).json({ message: "Access denied. No token provided."})
       }
-
-      // Attach the user information to the request object
-      req.user = user as JwtPayload;
-      return next(); // Call the next middleware function
-    });
-  } else {
-    res.sendStatus(401); // Send unauthorized status if no authorization header is present
-  }
-};
+      const token = authHeader.split(" ")[1]; // Extract token from "Bearer TOKEN"
+      const secretKey = process.env.JWT_SECRET_KEY || "";
+    
+      jwt.verify(token, secretKey, (err, decoded) => {
+        if (err) {
+          return res.status(403).json({ message: "Invalid or expired token" });
+        }
+    
+        const user = decoded as JwtPayload;
+    
+        // Check if token has expired
+        if (user.exp * 1000 < Date.now()) {
+          return res.status(403).json({ message: "Session expired. Please log in again." });
+        }
+    
+        req.user = user; // Attach user data to the request
+        next(); // Proceed to the next middleware
+      });
+    };
