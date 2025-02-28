@@ -31,7 +31,6 @@ class AuthService {
     // TODO: set the token to localStorage
     // TODO: redirect to the home page
     localStorage.setItem('id_token', idToken);
-    this.autoLogoutOnTokenExpiration();
     window.location.assign("/");
   }
 
@@ -39,31 +38,9 @@ class AuthService {
     // TODO: remove the token from localStorage
     // TODO: redirect to the login page
     localStorage.removeItem('id_token');
-    window.location.assign("/login");
+    window.location.assign('/');
   }
 
-  autoLogoutOnTokenExpiration() {
-      const token = this.getToken();
-      if (!token) return;
-  
-      try {
-        const decoded: JwtPayload = jwtDecode(token);
-        const expirationTime = decoded.exp ? decoded.exp * 1000 : 0; // Convert to milliseconds
-        const timeUntilExpiration = expirationTime - Date.now();
-  
-        if (timeUntilExpiration > 0) {
-          setTimeout(() => {
-            this.logout();
-          }, timeUntilExpiration);
-        } else {
-          this.logout();
-        }
-      } catch (error) {
-        console.error("Error decoding token for auto logout", error);
-        this.logout();
-      }
-  }
 }
-
 
 export default new AuthService();
