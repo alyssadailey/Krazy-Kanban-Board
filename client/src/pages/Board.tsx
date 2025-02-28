@@ -67,7 +67,7 @@ const Board = () => {
         </div>  
       ) : (
           <div className='board'>
-            <button type='button' id='create-ticket-link'>
+            <button className='new-ticket-btn'type='button' id='create-ticket-link'>
               <Link to='/create' >New Ticket</Link>
             </button>
             <div className='board-display'>

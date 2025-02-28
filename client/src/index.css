@@ -206,7 +206,16 @@ tbody tr:nth-child(odd) {
 }
 
 .form button {
+  
   margin-top: 2.5%;
+}
+
+.login-btn {
+  background-color: #B864C4; 
+}
+
+.new-ticket-btn{
+  background-color: #B864C4; 
 }
 
 .form textarea {
