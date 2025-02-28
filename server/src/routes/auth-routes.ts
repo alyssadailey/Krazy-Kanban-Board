@@ -24,11 +24,7 @@ export const login = async (req: Request, res: Response) => {
     return res.status(401).json({ message: 'Authentication failed' });
   }
 
-  const secretKey = process.env.JWT_SECRET_KEY;
-
-  if (!secretKey) {
-    throw new Error("JWT_SECRET_KEY is missing from environment variables");
-  }
+  const secretKey = process.env.JWT_SECRET_KEY || '';
 
   const token = jwt.sign({ id: user.id, username: user.username }, secretKey, { expiresIn: '1h' });
 
